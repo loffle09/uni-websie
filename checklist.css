@@ -1,0 +1,59 @@
+/* checklist.css */
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #121212;
+  color: #f1f1f1;
+  padding: 40px 20px;
+  line-height: 1.6;
+}
+
+h1 {
+  text-align: center;
+  color: #ffa500; /* McLaren orange */
+  margin-bottom: 40px;
+  font-size: 2rem;
+}
+
+.category {
+  margin-bottom: 50px;
+}
+
+.category h2 {
+  font-size: 1.4rem;
+  margin-bottom: 18px;
+  border-left: 4px solid #ffa500;
+  padding-left: 12px;
+  color: #ffa500;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  background: #1e1e1e;
+  padding: 14px 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #333;
+  transition: background 0.3s ease;
+}
+
+li:hover {
+  background: #2a2a2a;
+}
+
+li.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+input[type="checkbox"] {
+  margin-right: 14px;
+  transform: scale(1.3);
+  accent-color: #ffa500;
+  cursor: pointer;
+}

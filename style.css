@@ -1,0 +1,280 @@
+
+:root {
+  --accent-orange: #ff7f00; /* McLaren papaya orange */
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  padding: 0 20px;
+}
+
+/* Header */
+.uni-header {
+  text-align: center;
+  padding: 60px 20px 40px;
+  background: linear-gradient(135deg, #1f1f1f, #2a2a2a);
+  color: #ffffff;
+}
+
+.uni-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.uni-header p {
+  font-size: 1.2rem;
+  opacity: 0.85;
+}
+
+/* Skip buttons */
+.skip-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.skip-buttons button {
+  background: transparent;
+  color: var(--accent-orange);
+  border: 1px solid var(--accent-orange);
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skip-buttons button:hover {
+  background: var(--accent-orange);
+  color: #1a1a1a;
+}
+
+/* Sections */
+section {
+  max-width: 800px;
+  margin: 60px auto 10px;
+  padding: 30px;
+  background: #1c1c1c;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--accent-orange);
+  color: var(--accent-orange);
+  padding-bottom: 6px;
+}
+
+/* Grades List */
+.info-card ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+
+.contact-section {
+  margin-top: 30px;
+  padding: 20px 20px;
+  transform: translateY(-20px);
+  background-color: #111;
+  color: #fff;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.contact-section a {
+  color: #ffa600;
+  text-decoration: none;
+}
+
+.contact-section h2 {
+  margin-bottom: 5px; /* or 16px for slightly tighter spacing */
+}
+
+
+.contact-section a:hover {
+  text-decoration: underline;
+}
+
+.download-button-container {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.download-button-container button {
+  background-color: #ffa600;
+  color: #000;
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.download-button-container button:hover {
+  background-color: #cc8500;
+}
+
+@media print {
+  .download-button-container,
+  .skip-buttons,
+  nav,
+  footer {
+    display: none;
+  }
+
+  section {
+    box-shadow: none;
+    background: none;
+    border: none;
+  }
+}
+
+.blog-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.blog-card img {
+  width: 225px;
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.blog-text h3 {
+  margin-bottom: 12px;
+  color: var(--accent-orange);
+}
+
+.blog-text p {
+  margin-bottom: 15px;
+}
+
+.small-title {
+  font-size: 1.2rem; /* or whatever size you want */
+  font-weight: 500;
+  color: #fff;
+  border-bottom: 0px;
+  font-weight: bold;
+}
+
+.read-more-btn {
+  background: var(--accent-orange);
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.read-more-btn:hover {
+  background: #cc6a00;
+}
+
+/* Overlay Styles */
+.blog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: start;
+  overflow-y: auto;
+  padding: 60px 20px;
+  z-index: 9999;
+}
+
+.blog-overlay .overlay-content {
+  max-width: 800px;
+  background: #1c1c1c;
+  padding: 30px;
+  border-radius: 16px;
+  color: #eee;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.blog-overlay img {
+  width: 100%;
+  margin-top: 16px;
+  border-radius: 10px;
+}
+
+.blog-overlay p {
+  margin-bottom: 1.2em; /* Adjust to your preference */
+}
+
+.close-overlay {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.3s;
+}
+
+.close-overlay:hover {
+  color: #fff;
+}
+
+.overlay-content ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.code-showcase {
+  background: #1e1e1e;
+  color: #dcdcdc;
+  padding: 20px;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin-bottom: 40px;
+  font-family: 'Courier New', monospace;
+}
+
+.code-showcase h2 {
+  color: var(--accent-orange); /* If you're using McLaren orange */
+  margin-bottom: 10px;
+}
+
+.code-showcase pre {
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}

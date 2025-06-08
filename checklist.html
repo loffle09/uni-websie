@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Private Checklist</title>
+  <link rel="stylesheet" href="checklist.css">
+  <a href="index.html" style="position: fixed; top: 20px; right: 20px; color: #ffa500;">← Back</a>
+</head>
+<body>
+  <h1>🚀 My F1 Uni Checklist</h1>
+
+  <div class="category">
+    <h2>Summer</h2>
+    <ul>
+      <li><input type="checkbox">Finish Further Maths Paper Practice</li>
+      <li><input type="checkbox">Achieve Predicted A*AA+</li>
+    </ul>
+  </div>
+
+  <div class="category">
+    <h2>Collyers</h2>
+    <ul>
+      <li><input type="checkbox">Add PDF download of site</li>
+      <li><input type="checkbox">Dark mode blog card UI</li>
+      <li><input type="checkbox">Supercurricular blog updates</li>
+    </ul>
+  </div>
+
+  <div class="category">
+    <h2>Uni</h2>
+    <ul>
+      <li><input type="checkbox">Research Loughborough placement year options</li>
+      <li><input type="checkbox">Write draft personal statement</li>
+      <li><input type="checkbox">Reach out to a Formula Student team</li>
+    </ul>
+  </div>
+
+  <div class="category">
+    <h2>Books</h2>
+    <ul>
+      <li><input type="checkbox">Learn CAD basics (Fusion 360 / SolidWorks)</li>
+      <li><input type="checkbox">Create F1 Engineering Blog</li>
+      <li><input type="checkbox">Go to Autosport Engineering Show</li>
+    </ul>
+  </div>
+
+  <div class="category">
+    <h2>General Supercurriculars</h2>
+    <ul>
+      <li><input type="checkbox">Learn CAD basics (Fusion 360 / SolidWorks)</li>
+      <li><input type="checkbox">Create F1 Engineering Blog</li>
+      <li><input type="checkbox">Go to Autosport Engineering Show</li>
+    </ul>
+  </div>
+
+  <script>
+    // Save to localStorage
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((box, i) => {
+      const checked = localStorage.getItem('check-' + i);
+      if (checked === 'true') {
+        box.checked = true;
+        box.parentElement.classList.add('completed');
+      }
+
+      box.addEventListener('change', () => {
+        localStorage.setItem('check-' + i, box.checked);
+        box.parentElement.classList.toggle('completed');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name | University Application</title>
+  <link rel="stylesheet" href="style.css" />
+  <a href="checklist.html" style="position: fixed; top: 20px; right: 40px; color: #ffa500;" id="checklist-link">Checklist</a>
+</head>
+<body>
+  <header class="uni-header">
+    <h1>Your Name</h1>
+    <p>Applying to study [Subject] at university</p>
+
+    <div class="skip-buttons">
+      <button onclick="document.getElementById('grades').scrollIntoView({ behavior: 'smooth' })">Grades</button>
+      <button onclick="document.getElementById('blog-section').scrollIntoView({ behavior: 'smooth' })">Reflections</button>
+    </div>
+  </header>
+
+  <section id="grades" class="info-card">
+    <h2>Academic Profile</h2>
+    <ul>
+      <li>GCSEs: 9s in Maths, Physics, Chemistry, etc.</li>
+      <li>Predicted A-Levels: A*A*A*A* (Maths, FM, Physics, Chem)</li>
+      <li>EPQ: “The Aerodynamics of F1” – A*</li>
+      <li>Other: Gold in UKMT, Physics Olympiad Silver</li>
+    </ul>
+  </section>
+
+<section id="blog-section" class="blog-section">
+  <h2>Supercurriculars & Projects</h2>
+<!-- Blog Card (Preview) -->
+  <div class="blog-card">
+    <div class="blog-text">
+      <h3>Smart Planter Project:</h3>
+      <p>A Raspberry Pi Pico-powered system that uses sensors to keep your plants alive and connected.</p>
+      <button class="read-more-btn" data-target="smart-planter">Read More</button>
+    </div>
+    <img src="images/planter.jpg" alt="Smart Planter Preview">
+  </div>
+
+  <!-- Blog Full Post (Hidden Overlay) -->
+  <div class="blog-overlay" id="smart-planter">
+    <div class="overlay-content">
+      <span class="close-overlay">&times;</span>
+      <h2>Smart Planter Project</h2>
+      <p>This smart planter started as a simple idea for my DT gcse coursework with the goal help houseplants thrive while being as environmentally friendly as possible - but evolved into a multi-disciplinary design challenge involving a raspberry pi pico and lots of coding that tested my engineering, manufacturing, and problem-solving skills.</p>
+      <h2 class="small-title">💡 Design & Development</h2>
+      <p>Following interviews with potential users and exploring a range of concepts, I settled on a design that fits neatly on a windowsill — long, narrow, and minimal, with integrated LEDs and sensors to monitor moisture, light intensity, and temperature.</p>
+      <p>The system connects to a mobile app, sending notifications when the plant needs attention and allowing remote control of the LED brightness. I designed all components in CAD, developed an electronics system using a Raspberry Pi Pico, and refined the product through hands-on testing and user feedback.</p>
+      <h2 class="small-title">🔄 Key Design Changes</h2>
+      <ul>
+        <li>Replaced underpowered purple LEDs with bright white LEDs</li>
+        <li>Added tabs for easier inner-box removal</li>
+        <li>Added a floting indicator for the water level</li>
+        <li>Improved aesthetics by repositioning the USB port and using a cleaner finish</li>
+        <li>Made the light controls app-friendly, fixing bugs like server flooding and syncing issues</li>
+        <li>Designed some small corner supports so the stand could support itself</li>
+      </ul>
+      <h2 class="small-title">Code:</h2>
+      <p>I programmed the system using MicroPython, connecting sensors and LEDs via Wi-Fi to a custom interface. One key issue I resolved was reducing server overload when changing light intensity, by updating the system only when the slider is released.</p>
+      
+      <section class="code-showcase">
+        <pre><code class="language-python">
+      import network
+      import socket
+      import machine
+      import blynklib
+      from time import sleep
+      import onewire
+      import ds18x20
+      from machine import Pin, ADC, I2C, PWM
+      import veml7700
+      import gc
+
+      # Setup LED pins
+      led_pins = [7, 5, 8, 6, 3, 4, 2, 9, 1]
+      leds = [PWM(Pin(pin, Pin.OUT)) for pin in led_pins]
+
+      for led in leds:
+          led.freq(1000)
+          led.duty_u16(32768)
+
+      # Global variable for WiFi credentials
+      ssid = None
+      password = None
+
+      # Read saved WiFi credentials
+      def read_wifi_details():
+          try:
+              with open("wifi.txt", "r") as f:
+                  lines = f.readlines()
+                  return lines[0].strip(), lines[1].strip()
+          except:
+              return None, None
+
+      # Start AP mode
+      def start_access_point():
+          ap = network.WLAN(network.AP_IF)
+          ap.config(essid="Pico_Wifi_Setup", password="12345678")
+          ap.active(True)
+
+          print("AP Mode Started. Connect to 'Pico_Wifi_Setup' and visit 192.168.4.1")
+
+          while not ap.active():
+              pass  # Wait for AP activation
+
+          return ap.ifconfig()[0]  # Return AP IP address
+
+      # Start web server for WiFi setup
+      def start_web_server():
+          ip = start_access_point()
+          
+      html = """<!DOCTYPE html>
+      <html>
+      <head>
+          <title>Pico W WiFi Setup</title>
+          <style>
+              body { font-family: Arial; text-align: center; }
+              input, button { font-size: 20px; padding: 10px; margin: 10px; }
+          </style>
+      </head>
+      <body>
+          <h2>Enter WiFi Credentials</h2>
+          <form action="/connect" method="get">
+              SSID: <input type="text" name="ssid"><br>
+              Password: <input type="text" name="password"><br>
+              <button type="submit">Connect</button>
+          </form>
+      </body>
+      </html>"""
+
+          addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
+          s = socket.socket()
+          s.bind(addr)
+          s.listen(5)
+
+          print("Web server started. Connect to", ip)
+
+          while True:
+              conn, addr = s.accept()
+              request = conn.recv(1024).decode()
+
+              if "GET /connect?" in request:
+                  params = request.split("GET /connect?")[1].split(" ")[0]
+                  creds = {p.split("=")[0]: p.split("=")[1] for p in params.split("&")}
+                  
+                  global ssid, password
+                  ssid = creds.get("ssid", "").replace("%20", " ")
+                  password = creds.get("password", "")
+
+                  with open("wifi.txt", "w") as f:
+                      f.write(f"{ssid}\n{password}")
+
+                  response = "HTTP/1.1 200 OK\n\nSaved. Restarting to connect..."
+                  conn.send(response.encode())
+                  conn.close()
+                  ap = network.WLAN(network.AP_IF)  # Access the AP mode
+                  ap.active(False) 
+                  sleep(3)
+                  machine.reset()  # Restart Pico W
+
+              else:
+                  conn.send(html.encode())
+                  conn.close()
+
+      # Connect to WiFi or start AP
+      def connect_to_internet():
+          global ssid, password
+          ssid, password = read_wifi_details()
+
+          wlan = network.WLAN(network.STA_IF)
+          wlan.active(True)
+
+          if ssid and password:
+              wlan.connect(ssid, password)
+
+              max_wait = 10
+              while max_wait > 0:
+                  if wlan.status() < 0 or wlan.status() >= 3:
+                      break
+                  max_wait -= 1
+                  print("Waiting for connection...")
+                  sleep(1)
+
+              if wlan.status() != 3:
+                  print("WiFi connection failed")
+                  print(wlan.status())
+                  raise RuntimeError("Network connection failed")
+              else:
+                  print("WiFi connected:", wlan.ifconfig())
+              return True
+
+          else:
+              print("Failed to connect. Starting AP mode.")
+              start_web_server()  # If WiFi fails, ask user for WiFi
+              return False
+
+      # Initialize I2C for light sensor
+      i2c = I2C(0, scl=Pin(13, Pin.OPEN_DRAIN, pull=Pin.PULL_UP), 
+                  sda=Pin(12, Pin.OPEN_DRAIN, pull=Pin.PULL_UP), 
+                  freq=100000)
+
+      veml = veml7700.VEML7700(address=0x10, i2c=i2c, it=100, gain=1/8)
+
+      # Setup temperature sensor
+      ds_sensor = ds18x20.DS18X20(onewire.OneWire(Pin(28)))
+      roms = ds_sensor.scan()
+      if roms:
+          rom = roms[0]  
+
+      def read_temperature():
+          ds_sensor.convert_temp()
+          return ds_sensor.read_temp(rom)
+
+      # Connect to WiFi
+      if connect_to_internet():
+          # Retry mechanism for Blynk connection
+          MAX_RETRIES = 5
+          retries = 0
+          blynk_connected = False
+
+          while retries < MAX_RETRIES and not blynk_connected:
+              try:
+                  # Initialize Blynk
+                  print("Connecting to Blynk cloud...")
+                  blynk = blynklib.Blynk("qrTatSHRXTD4WCFX82P2MQkmOzYX4DQ-",
+                   server="blynk.cloud", port=80, insecure=True)
+                  blynk.connect()
+                  print("Blynk connected!")
+                  blynk_connected = True
+              except OSError as e:
+                  print(f"Blynk connection failed, retrying... ({retries+1}/{MAX_RETRIES})")
+                  retries += 1
+                  sleep(5)
+
+          if not blynk_connected:
+              print("Failed to connect to Blynk after multiple attempts.")
+              # Optionally reset the device or handle the failure gracefully
+              machine.reset()
+
+          # On/Off state
+          onoff = 2
+
+          @blynk.on("V1")
+          def v1_write(value): 
+              global onoff
+              if int(value[0]) == 1:
+                  for led in leds:
+                      led.duty_u16(32768)
+                  onoff = 1
+              else:
+                  for led in leds:
+                      led.duty_u16(0)
+                  onoff = 0
+              blynk.virtual_write(1, onoff)  # Update button state
+
+          # Blynk LED control handlers
+          @blynk.on("V0")
+          def v0_write(value):
+              if onoff == 1:
+                  brightness = int(value[0])
+                  pwm_value = int((brightness / 100) * 65535)
+                  for led in leds:
+                      led.duty_u16(pwm_value)
+
+          # Soil moisture sensor setup
+          soil = ADC(Pin(26))
+          
+          while True:
+              blynk.run()
+              
+              moisture = 2320000 / soil.read_u16()
+              temp = read_temperature()
+              lux_val = veml.read_lux()
+              
+              blynk.virtual_write(3, moisture)
+              blynk.virtual_write(2, temp)
+              blynk.virtual_write(4, lux_val)
+              
+              print("Temperature:", temp, "°C | Soil Moisture:", moisture, "% | Light:",
+               lux_val, "lux")
+              
+              gc.collect()
+              sleep(1)
+        </code></pre>
+      </section>
+
+      <h2 class="small-title">🔧 Testing & Problem Solving:</h2>
+      <p>I tested for waterproofing, wire routing, sensor accuracy, and LED coverage — discovering, for instance, that the light only reached 70% of the plants. Attempts to angle the LEDs weren’t effective, so I concluded the design needed a longer top piece or more powerful LEDs in future versions.</p>
+      <p>The floater that was meant to show water level looked clean but didn’t float — a material change would fix this in future manufacturing. </p>
+      <p>I also redesigned the sensor positioning to avoid exposed wiring and improved the overall cable routing for neatness and maintainability.</p>
+      <h2 class="small-title">🏭 Manufacturing Improvements:</h2>
+      <p>If I were to manufacture this commercially, I’d make key upgrades:</p>
+      <ul>
+        <li>Add magnets for a modular design (e.g. one stand, two planters) which woukd save energy and materials.</li>
+        <li>Use aluminum inside the stand for more rigidity and the potential to remove the corner supports, i robong aesthetics</li>
+        <li>Use injection moulding or kerf-bending for better finishes</li>
+        <li>Plan precise cutouts for USB and reset buttons</li>
+        <li>Consumers also said they would like multiple colours and sizes and better instructions on how to use</li>
+      </ul>
+      <h2 class="small-title">🔁 What I Learned:</h2>
+      <p>This project taught me about integrating software, electronics, and mechanical design into a cohesive system. I learned how to work through technical setbacks, respond to real user needs, and design for scale. It also gained me valuable experience in CAD designing and python coding that i will continue to nurture in the future.</p>
+
+
+
+      <img src="images/planter-build.jpg" alt="Planter Build">
+      <p> </p>
+      <img src="images/planter-ui.jpg" alt="UI Screenshot">
+    </div>
+  </div>
+</section>
+
+
+  <div class="download-button-container">
+    <button onclick="window.print()">Download as PDF</button>
+  </div>
+
+
+  <footer class="contact-section" id="contact">
+    <h2>Contact:</h2>
+    <p>You can reach me at: <a href="b.loffler09@gmail.com">b.loffler09@gmail.com</a></p>
+    <p>LinkedIn: <a href="https://www.linkedin.com/in/yourprofile" target="_blank">yourprofile</a></p>
+    <p>GitHub: <a href="https://github.com/yourgithub" target="_blank">yourgithub</a></p>
+  </footer>
+
+<script>
+  document.querySelectorAll('.read-more-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target;
+      document.getElementById(target).style.display = 'flex';
+    });
+  });
+
+  document.querySelectorAll('.close-overlay').forEach(closeBtn => {
+    closeBtn.addEventListener('click', () => {
+      closeBtn.closest('.blog-overlay').style.display = 'none';
+    });
+  });
+
+  // Optional: close on outside click
+  document.querySelectorAll('.blog-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.style.display = 'none';
+      }
+    });
+  });
+</script>
+<script>
+  document.querySelectorAll('code').forEach(block => {
+    block.innerHTML = block.textContent
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  });
+</script>
+</body>
+</html>
